@@ -16,6 +16,7 @@
 #include "file.h"
 #include "fcntl.h"
 
+
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
 static int
@@ -64,6 +65,74 @@ sys_dup(void)
     return -1;
   filedup(f);
   return fd;
+}
+
+
+int
+sys_dup2(void){
+
+  //* int dup2(oldfd,newfd)
+  /**
+  The dup2() system call performs the same task as dup(), but instead of using the lowest-numbered unused file descriptor, it uses 
+  the file descriptor number specified in newfd.  If the  file
+  descriptor newfd was previously open, it is silently closed before being reused.
+  */
+
+  /**
+
+   * If oldfd is not a valid file descriptor, then the call fails, and newfd is not closed.
+
+   * If oldfd is a valid file descriptor, and newfd has the same value as oldfd, then dup2() does nothing, and returns newfd.
+
+  */
+
+  //* On success, these system calls return the new file descriptor.  On error, -1 is returned, and errno is set appropriately.
+  
+  // argfd(0) y argint(1)
+  // oldfd==newfd
+  // if newfd abierto cerrar ( sys_close)
+  // duplicar oldfd en newfd filedup
+
+  // return newfd
+
+  struct file * f;
+  int newfd,oldfd;
+
+  //1. obtener y comprobar los argumentos de entrada
+
+  if(argfd(0,&oldfd,&f)<0){
+
+    return -1;
+  }
+
+  if(argint(1,&newfd)<0){
+
+    return -1;
+  }
+
+  if(newfd<0 || newfd>=NOFILE){
+
+    return -1;
+  }
+
+  //2 . si oldfd==newfd -> return newfd
+  if(oldfd==newfd){
+
+    return newfd;
+  }
+
+  //3. comprobar si fichero esta abierto -> cerrarlo
+  if(myproc()->ofile[newfd] != 0){
+
+    myproc()->ofile[newfd] = 0;
+    fileclose(f);
+  }
+
+  //4. Incrementar número de veces que el archivo esta referenciado f->ref+=1
+  filedup(f);
+
+  //5. 
+  return newfd;
 }
 
 int

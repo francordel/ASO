@@ -77,6 +77,27 @@ sys_sleep(void)
   return 0;
 }
 
+
+int
+sys_date(void){
+
+  struct rtcdate* r;
+
+  // argptr accede al parametro 0 de la pila del usuarioy lo introduce en la variable r indicando tamaño de la variable
+
+  if(argptr(0,(void**)&r,sizeof(struct rtcdate))<0){
+
+    return -1;
+
+  }
+
+  // llamada al sistema
+
+  cmostime(r);
+
+  return 0;
+}
+
 // return how many clock tick interrupts have occurred
 // since start.
 int
