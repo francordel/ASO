@@ -94,7 +94,7 @@ sys_dup2(void){
   // duplicar oldfd en newfd filedup
 
   // return newfd
-
+  
   struct file * f;
   int newfd,oldfd;
 
@@ -118,18 +118,18 @@ sys_dup2(void){
   //2 . si oldfd==newfd -> return newfd
   if(oldfd==newfd){
 
-    return newfd;
+    return oldfd;
   }
 
   //3. comprobar si fichero esta abierto -> cerrarlo
-  if(myproc()->ofile[newfd] != 0){
+  if(myproc()->ofile[newfd]!=0){
 
-    myproc()->ofile[newfd] = 0;
-    fileclose(f);
+    fileclose(myproc()->ofile[newfd]);
   }
+  myproc()->ofile[newfd]=filedup(f);
 
   //4. Incrementar número de veces que el archivo esta referenciado f->ref+=1
-  filedup(f);
+  
 
   //5. 
   return newfd;
