@@ -21,7 +21,8 @@ sys_exit(void)
 
   if(argint(0,&status)<0){
 
-    exit(0);
+    return -1;
+    //exit(0);
   }
 
   exit(status);
@@ -36,7 +37,7 @@ sys_wait(void)
   
   if(argptr(0,(void**)&status,sizeof(int*))){
 
-    wait(status);
+    return -1;
   }
 
   return wait(status);

@@ -171,8 +171,21 @@ main(void)
 
     }
 
-    int status;
+    int status=-1;
     wait(&status);
+
+     //if (WIFEXITED (status))
+    //if (status)
+
+      //printf (1, "Output code : %d\n",   WEXITSTATUS(status));
+      
+    //else if (WIFSIGNALED(status))
+    //else if (status==0)
+      //printf (1, "Output code : %d\n",  WEXITTRAP(status));
+    
+
+
+    printf(1,"Output code  : %d\n ", status);
 
     
   }

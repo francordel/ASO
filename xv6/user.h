@@ -6,6 +6,7 @@ struct rtcdate;
 # define WEXITSTATUS(status)(((status) & 0xff00 ) >> 8)
 # define WIFSIGNALED(status)(((status) & 0x7f ) != 0)
 
+
 // system calls
 extern int fork(void);
 extern int exit(int) __attribute__((noreturn));

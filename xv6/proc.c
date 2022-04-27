@@ -303,7 +303,7 @@ wait(int * status)
         //if (status != 0)
         //{
         *status = p->status;
-        cprintf("Status = %d\n",*status);
+        //cprintf("Status = %d\n",*status);
         //}
         return pid;
       }
