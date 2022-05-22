@@ -2,9 +2,9 @@
 struct stat;
 struct rtcdate;
 
-# define WIFEXITED(status)(((status) & 0x7f ) == 0)
-# define WEXITSTATUS(status)(((status) & 0xff00 ) >> 8)
-# define WIFSIGNALED(status)(((status) & 0x7f ) != 0)
+# define WIFEXITED(status)(((status) & 0x7f) == 0)
+# define WEXITSTATUS(status)(((status) & 0xff00) >> 8)
+# define WIFSIGNALED(status)(((status) & 0x7f) != 0)
 
 
 // system calls

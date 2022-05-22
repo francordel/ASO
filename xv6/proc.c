@@ -231,7 +231,10 @@ exit(int status)
   struct proc *p;
   int fd;
 
+
+  // establecemos el estado del proceso actual al codigo de salida que ha tenido
   curproc->status=status;
+
   //cprintf("exit received: %d\n",status);
 
   if(curproc == initproc)
@@ -300,11 +303,11 @@ wait(int * status)
         p->state = UNUSED;
         release(&ptable.lock);
 
-        //if (status != 0)
-        //{
+        // una vez llegamos a un hijo que aun no ha sido recogido establecemos su valor de salida por el valor final del proceso
         *status = p->status;
+        
         //cprintf("Status = %d\n",*status);
-        //}
+        
         return pid;
       }
     }

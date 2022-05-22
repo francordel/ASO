@@ -8,7 +8,7 @@
 #include "traps.h"
 #include "spinlock.h"
 
-# define WEXITTRAP (status)(((status)&0x7f)-1)
+# define WEXITTRAP (status)(((status) & 0x7f) -1)
 
 
 // Interrupt descriptor table (shared by all CPUs).

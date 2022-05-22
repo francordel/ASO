@@ -19,14 +19,16 @@ sys_exit(void)
 
   int status;
 
+  // recogemos el int y lo pasamos a la funcion exit de proc.c ( paso de parametro de la pila de usuario a kernel)
   if(argint(0,&status)<0){
 
-    return -1;
-    //exit(0);
+	  return -1;
   }
 
+  
   exit(status);
-  return 0;  // not reached
+  return 0;
+
 }
 
 int
@@ -34,10 +36,11 @@ sys_wait(void)
 {
   int * status;
 
-  
-  if(argptr(0,(void**)&status,sizeof(int*))){
+  // recogemos el puntero a int y lo pasamos a la funcion wait de proc.c( paso de parametro de la pila de usuario a kernel)
+	if(argptr(0,(void**)&status,sizeof(int*))<0){
 
-    return -1;
+	  return -1;
+   
   }
 
   return wait(status);
@@ -49,7 +52,7 @@ sys_kill(void)
   int pid;
 
   if(argint(0, &pid) < 0)
-    return -1;
+	return -1;
   return kill(pid);
 }
 
@@ -66,10 +69,10 @@ sys_sbrk(void)
   int n;
 
   if(argint(0, &n) < 0)
-    return -1;
+	return -1;
   addr = myproc()->sz;
   if(growproc(n) < 0)
-    return -1;
+	return -1;
   return addr;
 }
 
@@ -80,15 +83,15 @@ sys_sleep(void)
   uint ticks0;
 
   if(argint(0, &n) < 0)
-    return -1;
+	return -1;
   acquire(&tickslock);
   ticks0 = ticks;
   while(ticks - ticks0 < n){
-    if(myproc()->killed){
-      release(&tickslock);
-      return -1;
-    }
-    sleep(&ticks, &tickslock);
+	if(myproc()->killed){
+	  release(&tickslock);
+	  return -1;
+	}
+	sleep(&ticks, &tickslock);
   }
   release(&tickslock);
   return 0;
@@ -104,7 +107,7 @@ sys_date(void){
 
   if(argptr(0,(void**)&r,sizeof(struct rtcdate))<0){
 
-    return -1;
+	return -1;
 
   }
 

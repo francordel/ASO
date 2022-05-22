@@ -128,10 +128,7 @@ sys_dup2(void){
   }
   myproc()->ofile[newfd]=filedup(f);
 
-  //4. Incrementar número de veces que el archivo esta referenciado f->ref+=1
-  
 
-  //5. 
   return newfd;
 }
 
