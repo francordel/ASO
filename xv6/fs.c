@@ -388,7 +388,7 @@ bmap(struct inode *ip, uint bn)
     if((addr = ip->addrs[NDIRECT]) == 0)
       ip->addrs[NDIRECT] = addr = balloc(ip->dev);
     bp = bread(ip->dev, addr); // devuelve un buffer bloqueado con los contenidos del nodo
-    a = (uint*)bp->data; //! QUE DEVUELVE???
+    a = (uint*)bp->data; 
     if((addr = a[bn]) == 0){
       a[bn] = addr = balloc(ip->dev);
       log_write(bp); // escribe en el buffer que hemos obtenido antes
@@ -427,6 +427,10 @@ bmap(struct inode *ip, uint bn)
     }
     brelse(bp);
    
+
+
+
+    
     bp = bread(ip->dev, addr);
     a = (uint*)bp->data;
 
@@ -459,6 +463,9 @@ itrunc(struct inode *ip)
   struct buf *bp;
   uint *a;
 
+  // liberamos todos los bloques directos
+  // bfree + addr a 0
+
   for(i = 0; i < NDIRECT; i++){
     if(ip->addrs[i]){
       bfree(ip->dev, ip->addrs[i]);
@@ -466,16 +473,66 @@ itrunc(struct inode *ip)
     }
   }
 
+  // para cada simplemente indirecto liberamos todos sus bloques
+
   if(ip->addrs[NDIRECT]){
     bp = bread(ip->dev, ip->addrs[NDIRECT]);
     a = (uint*)bp->data;
-    for(j = 0; j < NINDIRECT; j++){
+    for(j = 0; j < NINDIRECT; j++){ // para cada uno de sus indirectos
       if(a[j])
         bfree(ip->dev, a[j]);
     }
     brelse(bp);
     bfree(ip->dev, ip->addrs[NDIRECT]);
     ip->addrs[NDIRECT] = 0;
+  }
+
+
+  struct buf *bp_aux;
+  uint *b;
+
+  // para cada bloque doblemente enlazado
+
+  if(ip->addrs[NDIRECT+1]){
+
+    bp = bread(ip->dev, ip->addrs[NDIRECT+1]);
+    a = (uint*)bp->data;
+
+    for(j = 0; j < NINDIRECT; j++){
+      
+        
+      if(a[j]) 
+      {
+        bp_aux = bread(ip->dev,a[j]);
+        b = (uint *)bp->data;
+
+        for (i = 0; i < NINDIRECT; i++) // liberamos el nivel 2
+        {
+          if (b[i]){
+
+            bfree(ip->dev, b[i]);
+
+          }
+        }
+
+
+        brelse(bp_aux);     // liberamos el nivel 1
+        bfree(ip->dev, a[i]); 
+        ip->addrs[j]=0;
+
+
+
+      }
+
+    }
+
+    // liberamos el bloque principal
+
+    brelse(bp);
+    bfree(ip->dev, ip->addrs[NDIRECT+1]);
+    ip->addrs[NDIRECT] = 0;
+
+     
   }
 
   ip->size = 0;

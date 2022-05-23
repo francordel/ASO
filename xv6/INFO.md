@@ -39,11 +39,20 @@
     * En inode actualizar -> uint addrs[NDIRECT+2]
     * Añadir BDI y calcular su tamaño ( 2 veces el BSI )
     * Actualizar el tamaño total del nodo [BSI+BDI+BD]
-    <br>
     * Implementar bmap con DOBLEMENTE_ENLANZADO -> dar bloque dentro de este nodo
 
 * **[file.h]**
     * Cambiar addr[NDIRECT+2] en la estructura del inode
+
+<br>
+
+<h3>BORRADO BLOQUE DOBLEMENTE ENLAZADO</h3><br>
+
+* **[fs.c]**
+    * Modificar itrunc para borrar los bloques doblemente enlazados
+        1. Liberar el bloque principal
+        2. Recorrer los indirectos y liberar los doblemente enlazados de dentro
+        3. Liberar los propios indirectos
 
 </br>
 
@@ -53,13 +62,11 @@
 
 1. EXITWAIT ES CORRECTO¿¿¿¿ PREGUNTAR PROFESOR
 2. SH DEVUELVE 0 SIEMPRE , CORRECTO ya que le pasamos siempre exit(0)?
-3. BP->DATA **[fs.c]** que es data? a = (uint*)bp->data;
 
 </br>
 
 *TODO*
 
 1. Tutoria EXITWAIT
-2. BIG FILES ( COMPROBAR EJ1 Y HACER EL 2)
-3. LAZY PAGE ALLOCATION
+2. LAZY PAGE ALLOCATION
 4. DOCUMENTACION
