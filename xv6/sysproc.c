@@ -25,7 +25,7 @@ sys_exit(void)
 	  return -1;
   }
 
-  
+  status=status<<8;
   exit(status);
   return 0;
 
