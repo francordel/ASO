@@ -62,6 +62,7 @@ sys_getpid(void)
   return myproc()->pid;
 }
 
+/*
 int
 sys_sbrk(void)
 {
@@ -70,9 +71,45 @@ sys_sbrk(void)
 
   if(argint(0, &n) < 0)
 	return -1;
+
   addr = myproc()->sz;
+
   if(growproc(n) < 0)
 	return -1;
+
+  return addr;
+}*/
+
+int
+sys_sbrk(void)
+{
+  int addr;
+  int n;
+
+  if(argint(0, &n) < 0){ // recogemos el argumento con el tamaño
+	  return -1;
+  }
+  addr = myproc()->sz;
+
+  if(n<0){ // si el tamaño es menor que el actual decrementamos ekl tamaño del proceso + quitar pags en growproc + growproc actualiza tabla de paginas
+
+    if(growproc(n) < 0){  //? growproc devuelve 0 si todo va bien o -1 si hay error
+	    return -1;
+    }
+    return addr;
+  }
+
+  if(n==0){ // si es igual devolvemos el tamaño que tiene myproc()->sz
+
+    return addr;
+  }
+
+  if(myproc()->sz+n>=KERNBASE){ // si nos pasamos del tam
+
+    return -1;
+  }
+  myproc()->sz+=n;
+
   return addr;
 }
 

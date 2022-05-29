@@ -29,6 +29,27 @@
 
 ---
 
+<h2>P3</h2></br> 
+
+<h3>RESERVA PEREZOSA DE MEMORIA Y EJ2</h3>
+
+* Modificamos sys_sbrk() en **[sysproc.c]** para que no reserve memoria
+* Ahora se generará un trap en **[trap.c]** porque no se ha reservado memoria por lo que cuando falte reservamos en la funcion trap :
+    * Cuando CASE PGFAULT -> comprobamos que la direccion donde falla es válida y llamamos a reservar memoria
+    * Este reservar memoria está en **[trap.c]** , creamos RESERVARPAGINA inspirado en allocuvm()
+
+* En copyuvm en **[vm.c]** modificamos los panic por continue para que se sigan copiando las páginas aunque no tengan espacio reservado
+
+<h3>EXEC</h3>
+
+* En [exec.c] cambiar el numero de allocuvm por (2*size)+SIZE_GUARD_PAGE
+
+<h3>FREEMEM</h3>
+
+<br>
+
+---
+
 <h2>P4</h2></br>
 
 
@@ -60,13 +81,12 @@
 
 *DUDAS*
 
-1. EXITWAIT ES CORRECTO¿¿¿¿ PREGUNTAR PROFESOR
-2. SH DEVUELVE 0 SIEMPRE , CORRECTO ya que le pasamos siempre exit(0)?
+1. TSBRK5 QUE SALIDA DEBERIA SER? PREGUNTAR PROFESOR
+2. PORQUE DE EXEC.C SIZE*2 + PG_SIZE
 
 </br>
 
 *TODO*
 
-1. Tutoria EXITWAIT
-2. LAZY PAGE ALLOCATION
-4. DOCUMENTACION
+1. FREE_MEM + SALIDA TSBRK5? + OUTPUT TSBRK2 NO ES CORRECTO
+2. DOCUMENTACION

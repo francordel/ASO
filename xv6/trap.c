@@ -35,6 +35,43 @@ idtinit(void)
   lidt(idt, sizeof(idt));
 }
 
+
+
+
+int
+reservarPagina(struct proc * proc,uint va){
+
+  char *mem;
+  uint a;
+  a=PGROUNDDOWN(va); // redondea la direccion virtual a limite de pagina
+
+
+  mem=kalloc(); // reserva una pagina fisica
+
+  if(mem==0){ // no nos da mas memoria
+
+    return -1;
+  }
+
+  memset(mem,0,PGSIZE); // inicializamos la pagina a 0
+
+
+  if(mappages(proc->pgdir, (char*)a, PGSIZE, V2P(mem), PTE_W|PTE_U) < 0){ // intentamos mapear la pagina a memoria
+
+    kfree(mem);
+    return -1;
+  }
+
+  // actualizar TLB
+
+  //lcr3(V2P(proc->pgdir));
+
+  return 0;
+
+}
+
+
+
 //PAGEBREAK: 41
 void
 trap(struct trapframe *tf)
@@ -80,6 +117,41 @@ trap(struct trapframe *tf)
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
+
+  case T_PGFLT: // si la pagina no esta presente la reservamos
+
+
+    //*rcr2 nos informa de que direccion se ha intentado acceder
+
+    if((tf->err & PTE_P) == 0 && rcr2()<myproc()->sz){
+
+
+      // reservar memoria
+      if(reservarPagina(myproc(),rcr2())<0){
+
+        myproc()->killed=1;
+        
+      }
+
+
+
+      break;
+
+    }
+    else if(rcr2() < myproc()->tf){ // acesso a zonas debajo de la pila //? requisito del boletin
+      
+      myproc()->killed=1;
+      break;
+    }
+    else if(rcr2()>=myproc()->sz){ // si el fallo se ha producido por acceder a una direccion superior al total de bytes que tiene el proceso
+
+      myproc()->killed=1;
+      break;
+    }
+
+
+
+
 
   //PAGEBREAK: 13
   default:
