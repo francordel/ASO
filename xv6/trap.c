@@ -123,7 +123,14 @@ trap(struct trapframe *tf)
 
     //*rcr2 nos informa de que direccion se ha intentado acceder
 
-    if((tf->err & PTE_P) == 0 && rcr2()<myproc()->sz){
+
+    if(rcr2()>=myproc()->sz){ // acesso a zonas debajo de la pila o   acceder a una direccion superior al total de bytes que tiene el proceso
+      
+      myproc()->killed=1;
+      break;
+    }
+
+    else if((tf->err & PTE_P) == 0 ){ // SI HAY error en la pila y el bit de page violation access esta activo
 
 
       // reservar memoria
@@ -138,17 +145,6 @@ trap(struct trapframe *tf)
       break;
 
     }
-    else if(rcr2() < myproc()->tf){ // acesso a zonas debajo de la pila //? requisito del boletin
-      
-      myproc()->killed=1;
-      break;
-    }
-    else if(rcr2()>=myproc()->sz){ // si el fallo se ha producido por acceder a una direccion superior al total de bytes que tiene el proceso
-
-      myproc()->killed=1;
-      break;
-    }
-
 
 
 

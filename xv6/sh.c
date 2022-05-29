@@ -173,9 +173,7 @@ main(void)
 
     int status;
     wait(&status);
-
-
-
+    
     printf(1,"Output code  : %d\n ", status);
 
     
