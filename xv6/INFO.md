@@ -46,6 +46,12 @@
 
 <h3>FREEMEM</h3>
 
+* Creamos la syscall en **[sysfile.c]** y la declaramos en los distintos sitios **[syscall.h]**,**[defs.h]** ... , para saber todas -> Buscar dup2
+* Macros de F_PAGES Y F_BYTES declarado en **[user.h]**
+* Creamos la funcion freemem en **[kalloc.c]**
+
+
+
 <br>
 
 ---
