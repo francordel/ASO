@@ -94,3 +94,20 @@ kalloc(void)
   return (char*)r;
 }
 
+int freemem(void){
+
+  struct run *r;
+
+  int pages=0;
+
+  r = kmem.freelist; // obtenemos la lista
+
+  acquire(&kmem.lock); // cogemos el lock para acceder a memoria
+  while(r){
+    pages += 1;
+    r = r->next;
+  }
+  release(&kmem.lock); // liberamos el lock
+  
+  return pages;
+}

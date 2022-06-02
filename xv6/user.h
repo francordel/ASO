@@ -31,6 +31,7 @@ extern int sleep(int);
 extern int uptime(void);
 extern int date(struct rtcdate*);
 extern int dup2(int olfd,int newfd);
+extern int freemem(int type);
 
 // ulib.c
 extern int stat(const char*, struct stat*);
@@ -47,3 +48,5 @@ extern void free(void*);
 extern int atoi(const char*);
 
 #define NULL 0
+#define F_PAGES 0
+#define F_BYTES 1

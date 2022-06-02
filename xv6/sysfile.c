@@ -132,6 +132,34 @@ sys_dup2(void){
   return newfd;
 }
 
+int sys_freemem(void){
+
+  int type=0;
+  int pages;
+
+  if((argint(0,&type))<0){
+
+    return -1;
+  }
+
+  pages=freemem();
+
+  if(type==0){ // nº de paginas en memoria fisica disponibles para asignar
+
+    return pages;
+
+  }
+
+  else{ // nº bytes de mem fisica para asignar
+
+    return PGSIZE*pages;
+
+  }
+
+
+}
+
+
 int
 sys_read(void)
 {
