@@ -39,10 +39,11 @@
     * Este reservar memoria está en **[trap.c]** , creamos RESERVARPAGINA inspirado en allocuvm()
 
 * En copyuvm en **[vm.c]** modificamos los panic por continue para que se sigan copiando las páginas aunque no tengan espacio reservado
+* En **[exec.c]** introducimos un nuevo campo para guardar la posición de la guarda y posteriormente tratar en caso de que se pida esa dirección.
 
 <h3>EXEC</h3>
 
-* En [exec.c] cambiar el numero de allocuvm por (2*size)+SIZE_GUARD_PAGE
+* En **[exec.c]** cambiar el numero de tamaño resevado para la pila.
 
 <h3>FREEMEM</h3>
 
