@@ -13,6 +13,7 @@
 
 #define MAXARGS 10
 
+
 struct cmd {
   int type;
 };
@@ -173,8 +174,16 @@ main(void)
 
     int status;
     wait(&status);
+
+    if(WIFEXITED(status)){
+
+      printf(1,"Output code  : %d\n ", WEXITSTATUS(status));
+    }
+    else if(WIFSIGNALED(status)){
+
+      printf(1,"Output code  : %d\n ", WEXITTRAP(status));
+    }
     
-    printf(1,"Output code  : %d\n ", status);
 
     
   }

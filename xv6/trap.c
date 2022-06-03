@@ -62,9 +62,6 @@ reservarPagina(struct proc * proc,uint va){
     return -1;
   }
 
-  // actualizar TLB
-
-  //lcr3(V2P(proc->pgdir));
 
   return 0;
 
@@ -85,6 +82,8 @@ trap(struct trapframe *tf)
       exit(0);
     return;
   }
+
+  uint dirErr;
 
   switch(tf->trapno){
   case T_IRQ0 + IRQ_TIMER:
@@ -123,28 +122,36 @@ trap(struct trapframe *tf)
 
     //*rcr2 nos informa de que direccion se ha intentado acceder
 
+    
+    dirErr=PGROUNDDOWN(rcr2());
 
-    if(rcr2()>=myproc()->sz){ // acesso a zonas debajo de la pila o   acceder a una direccion superior al total de bytes que tiene el proceso
+    if(dirErr>=myproc()->sz){  // nos pasamos del tamaño de heap reservado
       
       myproc()->killed=1;
       break;
     }
 
-    else if((tf->err & PTE_P) == 0 ){ // SI HAY error en la pila y el bit de page violation access esta activo
+    if(dirErr>=KERNBASE){ // si el error se da en una memoria perteneciente a la parte del OS en el proceso
 
-
-      // reservar memoria
-      if(reservarPagina(myproc(),rcr2())<0){
-
-        myproc()->killed=1;
-        
-      }
-
-
-
+      myproc()->killed=1;
       break;
 
     }
+
+    if(dirErr==myproc()->inicio_pagina_guarda){  // si nos metemos en la pagina de guarda
+
+      myproc()->killed=1;
+      break;
+    }
+    
+    if(reservarPagina(myproc(),rcr2())<0){  // hecha arriba ARRIBA 
+
+      myproc()->killed=1;
+        
+    }
+
+    break;
+
 
 
 

@@ -13,6 +13,7 @@ exec(char *path, char **argv)
   char *s, *last;
   int i, off;
   uint argc, sz, sp, ustack[3+MAXARG+1];
+  uint gp; //! NUEVO , USADO PARA PASAR INICIO DE LA PÁGINA DE GUARDA
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
@@ -62,11 +63,31 @@ exec(char *path, char **argv)
 
   // Allocate two pages at the next page boundary.
   // Make the first inaccessible.  Use the second as the user stack.
-  sz = PGROUNDUP(sz);                                       //* sz tiene tamaño de datos + codigo
-  if((sz = allocuvm(pgdir, sz, (2*sz)+ PGSIZE)) == 0)
+ 
+
+  sz = PGROUNDUP(sz);     //* sz tiene la última de datos y codigo
+
+  uint bloque_datos_y_codigo= sz/PGSIZE; //* número de paginas que ocupan datos y codigo
+
+
+  //? ESTO RESERVA ESPACIO PARA LA PILA Y LA PÁGINA DE GUARDA , ENCIMA DE CODIGO Y DATOS
+  if((sz = allocuvm(pgdir, sz, sz+(bloque_datos_y_codigo+1)*PGSIZE)) == 0) //* antes habia (sz+2*PGSIZE ) subimos el inicio del heap , creando espacio entre medias para pila + pagina de guarda
+    
+  //! BLOQUE DE DATOS Y CODIGO + 1 = PAGINA DE GUARDA + nº paginas de dato y codigo
+  //! sz+(bloque_datos_y_codigo+1)*PGSIZE = aumentar sz hasta ese tamaño
+
     goto bad;
-  clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
-  sp = sz;
+  clearpteu(pgdir, (char*)(sz - (bloque_datos_y_codigo+1)*PGSIZE)); // COGE EL INICIO DE LA PAGINA DE GUARDA =  FINAL PILA - PAGINAS DE LA PILA - PÁGINA GUARDA
+  sp = sz; //* sp contiene el final de la pila / comienzo del heap
+  //! NUEVO
+  //gp=sp-PGSIZE*2; //* Ya que al crear proceso el final de la pila es igual al principio del heap , por lo que 2 paginas menos es el inicio 
+                  //*de la página de guarda
+
+  gp=sp-((bloque_datos_y_codigo+1)*PGSIZE);
+
+  curproc->inicio_pagina_guarda=gp;
+
+
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {

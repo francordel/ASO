@@ -25,7 +25,7 @@ sys_exit(void)
 	  return -1;
   }
 
-  status=status<<8;
+  status=status<<8;   // parte menos significativa , desplazamos lo demás para que se traten bien los macros
   exit(status);
   return 0;
 
@@ -42,6 +42,8 @@ sys_wait(void)
 	  return -1;
    
   }
+
+  // el wait ya tiene en los 8 bits mas significativos el status
 
   return wait(status);
 }
@@ -94,23 +96,17 @@ sys_sbrk(void)
   addr = myproc()->sz;
 
   if(n<0){ // si el tamaño es menor que el actual decrementamos ekl tamaño del proceso + quitar pags en growproc + growproc actualiza tabla de paginas
-    //Aumenta tabla de paginas y va creando la memoria
+   
     if(growproc(n) < 0){  //? growproc devuelve 0 si todo va bien o -1 si hay error
 	    return -1;
     }
     return addr;
   }
 
-  if(n==0){ // si es igual devolvemos el tamaño que tiene myproc()->sz
-
-    return addr;
-  }
-
-  if(myproc()->sz+n>=KERNBASE){ // si nos pasamos del tam
-
-    return -1;
-  }
   myproc()->sz+=n;
+
+
+  // devolvemos la direccion donde empieza la nueva parte a reservar
 
   return addr;
 }
