@@ -80,6 +80,7 @@ sys_sbrk(void)
   return addr;
 }*/
 
+//Se le pasa el numero de elementos que quieres añadir a la memoria
 int
 sys_sbrk(void)
 {
@@ -89,10 +90,11 @@ sys_sbrk(void)
   if(argint(0, &n) < 0){ // recogemos el argumento con el tamaño
 	  return -1;
   }
+  //Limite del proceso
   addr = myproc()->sz;
 
   if(n<0){ // si el tamaño es menor que el actual decrementamos ekl tamaño del proceso + quitar pags en growproc + growproc actualiza tabla de paginas
-
+    //Aumenta tabla de paginas y va creando la memoria
     if(growproc(n) < 0){  //? growproc devuelve 0 si todo va bien o -1 si hay error
 	    return -1;
     }

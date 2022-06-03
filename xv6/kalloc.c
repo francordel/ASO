@@ -28,6 +28,7 @@ struct {
 // the pages mapped by entrypgdir on free list.
 // 2. main() calls kinit2() with the rest of the physical pages
 // after installing a full page table that maps them on all cores.
+//se usan kinit1 y kinit2 para mapear la memoria del kernel
 void
 kinit1(void *vstart, void *vend)
 {
@@ -39,6 +40,7 @@ kinit1(void *vstart, void *vend)
 void
 kinit2(void *vstart, void *vend)
 {
+  // libera un rango de memoria 
   freerange(vstart, vend);
   kmem.use_lock = 1;
 }
@@ -49,6 +51,7 @@ freerange(void *vstart, void *vend)
   char *p;
   p = (char*)PGROUNDUP((uint)vstart);
   for(; p + PGSIZE <= (char*)vend; p += PGSIZE)
+  // libera memoria usando una estructura simplemente enlazada que se almacena en los propios marcos de página
     kfree(p);
 }
 //PAGEBREAK: 21
@@ -79,6 +82,7 @@ kfree(char *v)
 // Allocate one 4096-byte page of physical memory.
 // Returns a pointer that the kernel can use.
 // Returns 0 if the memory cannot be allocated.
+//te devuelve un bloque de memoria libre
 char*
 kalloc(void)
 {

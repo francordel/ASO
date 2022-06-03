@@ -157,9 +157,13 @@ trap(struct trapframe *tf)
               tf->trapno, cpuid(), tf->eip, rcr2());
       panic("trap");
     }
+
     // In user space, assume process misbehaved.
     cprintf("pid %d %s: trap %d err %d on cpu %d "
             "eip 0x%x addr 0x%x--kill proc\n",
+            //mi identificador de proceso, mi nombre, tf->trapno ejecutado esta trap, tf->err he provocado este error, estoy en la Cpu tal
+            // este es el contador del programa y rcr2 es un registro interno del procesador qué nos dice cuando se produce 
+            //una excepción cuál es la dirección de memoria que la ha provocado
             myproc()->pid, myproc()->name, tf->trapno,
             tf->err, cpuid(), tf->eip, rcr2());
     myproc()->killed = 1;

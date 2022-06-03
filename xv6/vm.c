@@ -32,44 +32,67 @@ seginit(void)
 // Return the address of the PTE in page table pgdir
 // that corresponds to virtual address va.  If alloc!=0,
 // create any required page table pages.
+
+//Puntero a la entrada de segundo nivel donde quieres meter la traduccion
+
 static pte_t *
+          //Le pasan el comienzo de la tabla de paginas ( directorio de paginas pgdir)y una direccion virtual
 walkpgdir(pde_t *pgdir, const void *va, int alloc)
 {
   pde_t *pde;
   pte_t *pgtab;
-
+  //PDX me devuelve los 10 primeros bits de la dir virt
+  //Obtiene del directorio de paginas el puntero que apunta a la dir fis de donde esta el segundo nivel
   pde = &pgdir[PDX(va)];
+  //Comprueba que está presente y obtiene la dir fis
   if(*pde & PTE_P){
+    //Lo convierto a virtual porque no puedo acceder a dir fis y obtengo puntero
+    //dir virtual -> puntero dir fis -> entero
+    //Me dice el puntero a la tabla pag de segundo nivel
     pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
+  //Si no está presente
   } else {
+    //Si no me has pedido que lo cree o no he podido reservar memoria devuelvo 0
     if(!alloc || (pgtab = (pte_t*)kalloc()) == 0)
       return 0;
+    //Si sí, obtengo con kalloc un puntero a un marco físico y lo relleno de 0's el marco
     // Make sure all those PTE_P bits are zero.
     memset(pgtab, 0, PGSIZE);
     // The permissions here are overly generous, but they can
     // be further restricted by the permissions in the page table
     // entries, if necessary.
+    //Convierto el puntero a mem fis(entero) y lo guardo en el puntero a la tabla pag de segundo nivel
     *pde = V2P(pgtab) | PTE_P | PTE_W | PTE_U;
   }
+  //Con PTX me quedo con los segundos 10 bits de va [10][10][12]
+  //Devuelvo el puntero a el contenido de la posicion en la tabla de pag del 2º nivel
   return &pgtab[PTX(va)];
 }
 
 // Create PTEs for virtual addresses starting at va that refer to
 // physical addresses starting at pa. va and size might not
 // be page-aligned.
+
+//La pagina virtual va se mapea a pa (pagina fisica) y todas las direcciones virtuales se iran mapeando va1 a pa1 va2 a pa2 etc
+//size me dice cuantas paginas voy a mapear
 int
 mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm)
 {
   char *a, *last;
   pte_t *pte;
-
+//primera pagina a mapear con PGROUNDDOWN obtengo la pagina a la q se mapearia va
   a = (char*)PGROUNDDOWN((uint)va);
+  //ultima pagina a mapear con PGROUNDDOWN obtengo la ultima pagina a la q se mapearia va
   last = (char*)PGROUNDDOWN(((uint)va) + size - 1);
+  //Comprobaciones
   for(;;){
+    //Puntero a la entrada de segundo nivel donde quieres meter la traduccion
     if((pte = walkpgdir(pgdir, a, 1)) == 0)
       return -1;
     if(*pte & PTE_P)
       panic("remap");
+
+    //Le meto la pagina fisica a pte (entrada de segundo nivel) con los flags
     *pte = pa | perm | PTE_P;
     if(a == last)
       break;
@@ -121,12 +144,16 @@ setupkvm(void)
   pde_t *pgdir;
   struct kmap *k;
 
+  //Kalloc me devuelve un marco físico nuevo (devolviendo un puntero) para que pueda acceder a el
   if((pgdir = (pde_t*)kalloc()) == 0)
     return 0;
   memset(pgdir, 0, PGSIZE);
+
   if (P2V(PHYSTOP) > (void*)DEVSPACE)
     panic("PHYSTOP too high");
+
   for(k = kmap; k < &kmap[NELEM(kmap)]; k++)
+  //mapea paginas virtuales a paginas fisicas
     if(mappages(pgdir, k->virt, k->phys_end - k->phys_start,
                 (uint)k->phys_start, k->perm) < 0) {
       freevm(pgdir);
@@ -140,6 +167,7 @@ setupkvm(void)
 void
 kvmalloc(void)
 {
+  //Configura la memoria virtual del kernel rellenando los 2 primeros GB de la memoria
   kpgdir = setupkvm();
   switchkvm();
 }
@@ -218,6 +246,8 @@ loaduvm(pde_t *pgdir, char *addr, struct inode *ip, uint offset, uint sz)
 
 // Allocate page tables and physical memory to grow process from oldsz to
 // newsz, which need not be page aligned.  Returns new size or 0 on error.
+
+//Reserva memoria cuando incrementa el tamaño del heap desde el tamaño antiguo al nuevo
 int
 allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 {
@@ -231,7 +261,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 
   a = PGROUNDUP(oldsz);
   for(; a < newsz; a += PGSIZE){
-    mem = kalloc(); 
+    mem = kalloc();
     if(mem == 0){    // si no se puede alojar en la memoria fisica
       cprintf("allocuvm out of memory\n");
       deallocuvm(pgdir, newsz, oldsz);
@@ -395,4 +425,6 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
 // Blank page.
 //PAGEBREAK!
 // Blank page.
+
+
 
