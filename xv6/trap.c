@@ -46,7 +46,7 @@ reservarPagina(struct proc * proc,uint va){
   a=PGROUNDDOWN(va); // redondea la direccion virtual a limite de pagina
 
 
-  mem=kalloc(); // reserva una pagina fisica
+  mem=kalloc(); // reserva una pagina fisica || mem es direccion virtual que apunta a direccion fisica
 
   if(mem==0){ // no nos da mas memoria
 
@@ -180,7 +180,13 @@ trap(struct trapframe *tf)
   // (If it is still executing in the kernel, let it keep running
   // until it gets to the regular system call return.)
   if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
-    exit(0);
+    exit(tf->trapno+1);
+     //*con una pequeña diferencia, que como el error (trap) puede ser 0, al
+      //*retornar el número de trap, se tiene que sumar uno a su valor
+
+
+    //* en sucesión de fibonnaci se pasa del heap
+    //exit(0);
 
   // Force process to give up CPU on clock tick.
   // If interrupts were on while locks held, would need to check nlock.
@@ -190,5 +196,6 @@ trap(struct trapframe *tf)
 
   // Check if the process has been killed since we yielded
   if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
-    exit(0);
+    exit(tf->trapno+1);
+    //exit(0);
 }

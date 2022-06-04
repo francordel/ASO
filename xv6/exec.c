@@ -13,7 +13,6 @@ exec(char *path, char **argv)
   char *s, *last;
   int i, off;
   uint argc, sz, sp, ustack[3+MAXARG+1];
-  uint gp; //! NUEVO , USADO PARA PASAR INICIO DE LA PÁGINA DE GUARDA
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
@@ -67,6 +66,8 @@ exec(char *path, char **argv)
 
   sz = PGROUNDUP(sz);     //* sz tiene la última de datos y codigo
 
+  curproc->inicio_pagina_guarda=sz;
+
   uint bloque_datos_y_codigo= sz/PGSIZE; //* número de paginas que ocupan datos y codigo
 
 
@@ -78,15 +79,12 @@ exec(char *path, char **argv)
 
     goto bad;
   clearpteu(pgdir, (char*)(sz - (bloque_datos_y_codigo+1)*PGSIZE)); // COGE EL INICIO DE LA PAGINA DE GUARDA =  FINAL PILA - PAGINAS DE LA PILA - PÁGINA GUARDA
+  //clearpteu limpia la pagina de guarda
+
   sp = sz; //* sp contiene el final de la pila / comienzo del heap
   //! NUEVO
   //gp=sp-PGSIZE*2; //* Ya que al crear proceso el final de la pila es igual al principio del heap , por lo que 2 paginas menos es el inicio 
                   //*de la página de guarda
-
-  gp=sp-((bloque_datos_y_codigo+1)*PGSIZE);
-
-  curproc->inicio_pagina_guarda=gp;
-
 
 
   // Push argument strings, prepare rest of stack in ustack.

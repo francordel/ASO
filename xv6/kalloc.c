@@ -100,7 +100,7 @@ kalloc(void)
 
 int freemem(int type){
 
-  struct run *r; //lista paginas del proceso
+  struct run *r; // estructura para almacenar el primer nodo de la lista de paginas libres
 
   int pages=0;
 
@@ -110,7 +110,7 @@ int freemem(int type){
     acquire(&kmem.lock);
   }
   
-  r = kmem.freelist; // lista paginas libres del proceso
+  r = kmem.freelist; // lista paginas libres de memoria fisica
   
   while(r){
     pages++;

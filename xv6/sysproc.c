@@ -92,15 +92,17 @@ sys_sbrk(void)
   if(argint(0, &n) < 0){ // recogemos el argumento con el tamaño
 	  return -1;
   }
-  //Limite del proceso
+  //Limite del heap / del proceso en modo usuario
   addr = myproc()->sz;
 
   if(n<0){ // si el tamaño es menor que el actual decrementamos ekl tamaño del proceso + quitar pags en growproc + growproc actualiza tabla de paginas
    
-    if(growproc(n) < 0){  //? growproc devuelve 0 si todo va bien o -1 si hay error
+    if(growproc(n) < 0){  //? growproc devuelve 0 si todo va bien o -1 si hay error 
+
+      // dentro de growproc -> deallocvum se actualiza el proc->sz del proceso 
 	    return -1;
     }
-    return addr;
+    return addr;      
   }
 
   myproc()->sz+=n;
