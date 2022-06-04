@@ -134,28 +134,17 @@ sys_dup2(void){
 
 int sys_freemem(void){
 
-  int type=0;
-  int pages;
+  // devolvemos paginas o memoria dependiendo de la entrada
+
+  int type;
 
   if((argint(0,&type))<0){
 
     return -1;
   }
 
-  pages=freemem();
 
-  if(type==0){ // nº de paginas en memoria fisica disponibles para asignar
-
-    return pages;
-
-  }
-
-  else{ // nº bytes de mem fisica para asignar
-
-    return PGSIZE*pages;
-
-  }
-
+  return freemem(type);
 
 }
 

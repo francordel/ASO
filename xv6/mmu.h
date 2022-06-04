@@ -100,6 +100,12 @@ struct segdesc {
 #define PTE_ADDR(pte)   ((uint)(pte) & ~0xFFF)
 #define PTE_FLAGS(pte)  ((uint)(pte) &  0xFFF)
 
+
+//*P3
+#define F_PAGES 0
+#define F_BYTES 1
+
+
 #ifndef __ASSEMBLER__
 typedef uint pte_t;
 

@@ -86,7 +86,7 @@ kfree(char *v)
 char*
 kalloc(void)
 {
-  struct run *r;
+  struct run *r; 
 
   if(kmem.use_lock)
     acquire(&kmem.lock);
@@ -98,20 +98,41 @@ kalloc(void)
   return (char*)r;
 }
 
-int freemem(void){
+int freemem(int type){
 
-  struct run *r;
+  struct run *r; //lista paginas del proceso
 
   int pages=0;
 
-  r = kmem.freelist; // obtenemos la lista
 
-  acquire(&kmem.lock); // cogemos el lock para acceder a memoria
+  if(kmem.use_lock){
+
+    acquire(&kmem.lock);
+  }
+  
+  r = kmem.freelist; // lista paginas libres del proceso
+  
   while(r){
-    pages += 1;
+    pages++;
     r = r->next;
   }
-  release(&kmem.lock); // liberamos el lock
   
-  return pages;
+  if(kmem.use_lock){
+
+    release(&kmem.lock);
+
+  }
+  
+  if(type==F_PAGES){
+
+    return pages;
+  }
+
+  else if(type==F_BYTES){
+
+    return PGSIZE*pages;
+
+  }
+
+  return -1;
 }

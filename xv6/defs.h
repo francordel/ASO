@@ -66,7 +66,7 @@ void            ioapicinit(void);
 // kalloc.c
 char*           kalloc(void);
 void            kfree(char*);
-int            freemem(void);
+int             freemem(int status);
 void            kinit1(void*, void*);
 void            kinit2(void*, void*);
 
@@ -192,3 +192,5 @@ int             mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm);
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
 
 #define NULL 0
+
+

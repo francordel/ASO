@@ -9,6 +9,7 @@ struct rtcdate;
 #define WEXITTRAP(status) ((( status) & 0x7f) - 1)
 
 
+
 // system calls
 extern int fork(void);
 extern int exit(int) __attribute__((noreturn));
@@ -49,6 +50,6 @@ extern void* malloc(uint);
 extern void free(void*);
 extern int atoi(const char*);
 
+
 #define NULL 0
-#define F_PAGES 0
-#define F_BYTES 1
+
