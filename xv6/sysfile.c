@@ -19,6 +19,8 @@
 
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
+// obtiene el argumento n de la llamada al sistema y
+  // a partir de el obtiene el fichero correspondiente
 static int
 argfd(int n, int *pfd, struct file **pf)
 {
@@ -99,7 +101,8 @@ sys_dup2(void){
   int newfd,oldfd;
 
   //1. obtener y comprobar los argumentos de entrada
-
+  // obtiene el argumento 0 de la llamada al sistema y
+  // a partir de el obtiene el fichero correspondiente
   if(argfd(0,&oldfd,&f)<0){
 
     return -1;
@@ -126,6 +129,9 @@ sys_dup2(void){
 
     fileclose(myproc()->ofile[newfd]);
   }
+  // filedup incrementa el contador del número de descriptores de ficheros que 
+  // apuntan a ese fichero y devuelve el puntero a la esctructura fichero
+  // le añadimos ese fichero al nuevo descriptor de fichero
   myproc()->ofile[newfd]=filedup(f);
 
 

@@ -46,6 +46,7 @@ fetchstr(uint addr, char **pp)
 }
 
 // Fetch the nth 32-bit system call argument.
+// obtiene el argumento n (entero) de la llamada al sistema
 int
 argint(int n, int *ip)
 {

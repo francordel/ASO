@@ -24,7 +24,12 @@ sys_exit(void)
 
 	  return -1;
   }
-
+  /*
+    cuando un proceso termina este sale con un exit pasandole el estatus
+    con el que termina. Los bits que nos interesan son los ocho menos significativos
+    de la rista de 16 bits que se pasan por eso desplazamos 8 bits a la izquierda
+    para trener los 8 bits importantes en los 8 bits mas significativos
+  */
   status=status<<8;   // parte menos significativa , desplazamos lo demás para que se traten bien los macros
   exit(status);
   return 0;
@@ -141,7 +146,8 @@ sys_date(void){
 
   struct rtcdate* r;
 
-  // argptr accede al parametro 0 de la pila del usuarioy lo introduce en la variable r indicando tamaño de la variable
+  // argptr accede al parametro 0 de la pila del usuarioy lo introduce en 
+  //la variable r indicando tamaño de la variable
 
   if(argptr(0,(void**)&r,sizeof(struct rtcdate))<0){
 

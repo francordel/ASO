@@ -171,7 +171,11 @@ main(void)
 
 
     }
-
+    /*
+      el shell lo que hace al ejecutar por consola un comando es crear un hijo
+      lo que hacemos aqui es esperar al hijo con wait y recibimos su status y 
+      lo que hacemos ahora es mostrar con la macro correspondiente su valor
+    */
     int status;
     wait(&status);
 
