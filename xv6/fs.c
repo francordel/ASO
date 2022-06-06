@@ -370,6 +370,8 @@ iunlockput(struct inode *ip)
 
 // Return the disk block address of the nth block in inode ip.
 // If there is no such block, bmap allocates one.
+//  le pasas la estructura nodo-i de un fichero y un número de nodo-i y te devuelve 
+// la dirección del bloque correspondiente a ese nodo-i
 static uint
 bmap(struct inode *ip, uint bn)
 {
@@ -378,6 +380,8 @@ bmap(struct inode *ip, uint bn)
 
   if(bn < NDIRECT){ // si es un bloque directo comprobamos si esta reservado // allocated
     if((addr = ip->addrs[bn]) == 0)
+    //Seleccionamos un bloque de memoria que este libre y lo hacemos corresponder
+      //con un numero de nodo-i
       ip->addrs[bn] = addr = balloc(ip->dev); // si no lo esta reservamos
     return addr;
   }
@@ -385,13 +389,18 @@ bmap(struct inode *ip, uint bn)
 
   if(bn < NINDIRECT){
     // Load indirect block, allocating if necessary.
+    //comprobamos el bloque, que es el que esta a continuacion de los directos(NDIRECT)
     if((addr = ip->addrs[NDIRECT]) == 0)
+      //Seleccionamos un bloque de memoria que este libre y lo hacemos corresponder
+      //con un numero de nodo-i
       ip->addrs[NDIRECT] = addr = balloc(ip->dev);
     bp = bread(ip->dev, addr); // devuelve un buffer bloqueado con los contenidos del nodo
+    // devuelve un buffer con una copia de un bloque que puede leerse y modificarse en memoria
+    // Accede a la lista de bloques directos del simplemente indirecto
     a = (uint*)bp->data; 
     if((addr = a[bn]) == 0){
       a[bn] = addr = balloc(ip->dev);
-      log_write(bp); // escribe en el buffer que hemos obtenido antes
+      log_write(bp); // escribe en el buffer que hemos obtenido antes Los cambios
     } 
     brelse(bp); // desbloquea el buffer
     return addr;
@@ -405,14 +414,21 @@ bmap(struct inode *ip, uint bn)
 
 
   //? bfree hace lo contrario
+  // Le restamos el número de nodos y que almacena un bloque simplemente indirecto
   bn-=NINDIRECT;
 
+  //Comprobamos que lo que queda es almacenable por un bloque doblemente indirecto
   if(bn<NBDE){
 
-    // comprobamos el bloque
+    // comprobamos el bloque, que es el que esta a continuacion del simplemente indirecto(NDIRECT+1)
     if((addr = ip->addrs[NDIRECT+1]) == 0)
+      //Seleccionamos un bloque de memoria que este libre y lo hacemos corresponder
+      //con un numero de nodo-i
       ip->addrs[NDIRECT+1] = addr = balloc(ip->dev);
+    // devuelve un buffer con una copia de un bloque que puede leerse y modificarse en memoria
+    // y lo bloquea
     bp = bread(ip->dev, addr);
+    // Accede a la lista de bloques simplemente indirectos del doblemente indirecto
     a = (uint*)bp->data;
     
     // en a tenemos los BSI
@@ -422,27 +438,33 @@ bmap(struct inode *ip, uint bn)
     //comprobamos el BSIs
     if((addr =a[index_bsi])==0)
     {
+      //Seleccionamos un bloque de memoria que este libre y lo hacemos corresponder
+      //con un numero de nodo-i
       a[index_bsi] = addr = balloc(ip->dev);
-      log_write(bp);
+      log_write(bp);// escribe en el buffer que hemos obtenido antes Los cambios
     }
-    brelse(bp);
+    brelse(bp);// desbloquea el buffer
    
 
 
 
-    
+    // devuelve un buffer con una copia de un bloque que puede leerse y modificarse en memoria
+    // y lo bloquea
     bp = bread(ip->dev, addr);
+    // Accede a la lista de bloques directos del simplemente indirecto del doblemente indirecto
     a = (uint*)bp->data;
 
-    // ahora en a tenemos los doblemente enlazados
+    // ahora en a tenemos los directos del simplemente indirecto del doblemente indirecto
 
-    uint index_bde = bn % NINDIRECT; // obtenemos el indice de los doblemente enlazados
+    uint index_bde = bn % NINDIRECT; // obtenemos el indice de los  directos del simplemente indirecto del doblemente indirecto
     if((addr =a[index_bde])==0)
     {
+      //Seleccionamos un bloque de memoria que este libre y lo hacemos corresponder
+      //con un numero de nodo-i
       a[index_bde] = addr = balloc(ip->dev);
-      log_write(bp);
+      log_write(bp); // escribe en el buffer que hemos obtenido antes Los cambios
     }
-    brelse(bp);
+    brelse(bp); // desbloquea el buffer
     return addr;
 
   }
