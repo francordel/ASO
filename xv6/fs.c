@@ -517,9 +517,9 @@ itrunc(struct inode *ip)
 
 
         brelse(bp_aux);     // liberamos el nivel 1
-        bfree(ip->dev, a[i]); 
-        ip->addrs[j]=0;
-
+        bfree(ip->dev, a[j]); 
+        //ip->addrs[j]=0;
+        a[j]=0;
 
 
       }
@@ -530,7 +530,7 @@ itrunc(struct inode *ip)
 
     brelse(bp);
     bfree(ip->dev, ip->addrs[NDIRECT+1]);
-    ip->addrs[NDIRECT] = 0;
+    ip->addrs[NDIRECT+1] = 0;
 
      
   }
